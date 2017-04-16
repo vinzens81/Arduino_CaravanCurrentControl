@@ -58,6 +58,7 @@ bool motorRunning = false;
 long motorOffDelay = 1200000;
 long motorRunningDelay = 300000;
 int lowCurrent = 5800;
+int voltRunningMotor = 12;
 
 void setup()
 {
@@ -80,11 +81,11 @@ void loop()
 {
   // Check if motor Running
   for ( int i; i < 10; i++) {
-    readAnalogPortsVolt();
+    readAnalogPortsVolt1();
     delay(100);
   }
 
-  if (sensor1V > 12) {
+  if (sensor1V > voltRunningMotor) {
     Serial.println("We assume the motor is running...");
     motorRunning = true;
   } else {
@@ -98,13 +99,13 @@ void loop()
 
     for ( int i; i < 10; i++) {
       // Get the Average right... Starting far to low.
-      readAnalogPortsCurrent();
-      Serial.print(sensor1mA); Serial.println(" mA Sens1");
+      readAnalogPortsCurrent1();
+      Serial.print(sensor1mA); Serial.println(" mA Sensor 1");
       delay(100);
     }
     for (;;) {
-      readAnalogPortsCurrent();
-      Serial.print(sensor1mA); Serial.println(" mA Sens1");
+      readAnalogPortsCurrent1();
+      Serial.print(sensor1mA); Serial.println(" mA Sensor 1");
       if (sensor1mA < lowCurrent) {
         Serial.println("low on current break the innter loop");
         digitalWrite(RELAIS1, LOW);
@@ -123,7 +124,7 @@ void loop()
 }
 
 
-void readAnalogPortsCurrent() {
+void readAnalogPortsCurrent1() {
   CurrSens1Total = CurrSens1Total - CurrSens1Readings[CurrSens1ReadIndex];
   CurrSens1Readings[CurrSens1ReadIndex] = analogRead(CurrSens1InputPin);
   CurrSens1Total = CurrSens1Total + CurrSens1Readings[CurrSens1ReadIndex];
@@ -138,7 +139,8 @@ void readAnalogPortsCurrent() {
     OldCurrSens1AverageDiviation = OldCurrSens1AverageDiviation * -1;
   }
   sensor1mA = ((((long)CurrSens1Average * 5000 / 1024) - 498 ) * 1000 / 133);
-
+}
+void readAnalogPortsCurrent2() {
   CurrSens2Total = CurrSens2Total - CurrSens2Readings[CurrSens2ReadIndex];
   CurrSens2Readings[CurrSens2ReadIndex] = analogRead(CurrSens2InputPin);
   CurrSens2Total = CurrSens2Total + CurrSens2Readings[CurrSens2ReadIndex];
@@ -155,7 +157,7 @@ void readAnalogPortsCurrent() {
   sensor2mA = ((((long)CurrSens2Average * 5000 / 1024) - 498 ) * 1000 / 133);
 }
 
-void readAnalogPortsVolt() {
+void readAnalogPortsVolt2() {
   VoltSens2Total = VoltSens2Total - VoltSens2Readings[VoltSens2ReadIndex];
   VoltSens2Readings[VoltSens2ReadIndex] = analogRead(VoltSens2InputPin);
   VoltSens2Total = VoltSens2Total + VoltSens2Readings[VoltSens2ReadIndex];
@@ -170,7 +172,8 @@ void readAnalogPortsVolt() {
     OldVoltSens2AverageDiviation = OldVoltSens2AverageDiviation * -1;
   }
   sensor2V = (5.0 / 1024 * VoltSens2Average) + 10.3;
-
+}
+void readAnalogPortsVolt1() {
   VoltSens1Total = VoltSens1Total - VoltSens1Readings[VoltSens1ReadIndex];
   VoltSens1Readings[VoltSens1ReadIndex] = analogRead(VoltSens1InputPin);
   VoltSens1Total = VoltSens1Total + VoltSens1Readings[VoltSens1ReadIndex];
